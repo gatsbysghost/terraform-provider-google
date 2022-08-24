@@ -210,6 +210,20 @@ be created with this service account credentials. It requires that
 requesting user calling this API has permissions to act as this service account.`,
 				Default: "",
 			},
+			"version_info": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+				Description: `Optional version info. This is required only if the data_source_id
+is not 'youtube_channel' and new credentials are needed.`,
+			},
+			"authorization_code": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+				Description: `Optional OAuth2 authorization code to use with this transfer configuration.
+This is required only if data_source_id is 'youtube_channel' and new credentials are needed.`,
+			},
 			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -290,6 +304,18 @@ func resourceBigqueryDataTransferConfigCreate(d *schema.ResourceData, meta inter
 		return err
 	} else if v, ok := d.GetOkExists("disabled"); !isEmptyValue(reflect.ValueOf(disabledProp)) && (ok || !reflect.DeepEqual(v, disabledProp)) {
 		obj["disabled"] = disabledProp
+	}
+	versionInfoProp, err := expandBigqueryDataTransferConfigVersionInfo(d.Get("version_info"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("version_info"); !isEmptyValue(reflect.ValueOf(versionInfoProp)) && (ok || !reflect.DeepEqual(v, versionInfoProp)) {
+		obj["versionInfo"] = versionInfoProp
+	}
+	authorizationCodeProp, err := expandBigqueryDataTransferConfigAuthorizationCode(d.Get("authorization_code"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("authorization_code"); !isEmptyValue(reflect.ValueOf(authorizationCodeProp)) && (ok || !reflect.DeepEqual(v, authorizationCodeProp)) {
+		obj["authorizationCode"] = authorizationCodeProp
 	}
 	paramsProp, err := expandBigqueryDataTransferConfigParams(d.Get("params"), d, config)
 	if err != nil {
@@ -501,6 +527,18 @@ func resourceBigqueryDataTransferConfigUpdate(d *schema.ResourceData, meta inter
 	} else if v, ok := d.GetOkExists("data_refresh_window_days"); !isEmptyValue(reflect.ValueOf(v)) && (ok || !reflect.DeepEqual(v, dataRefreshWindowDaysProp)) {
 		obj["dataRefreshWindowDays"] = dataRefreshWindowDaysProp
 	}
+	versionInfoProp, err := expandBigqueryDataTransferConfigVersionInfo(d.Get("version_info"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("version_info"); !isEmptyValue(reflect.ValueOf(v)) && (ok || !reflect.DeepEqual(v, versionInfoProp)) {
+		obj["versionInfo"] = versionInfoProp
+	}
+	authorizationCodeProp, err := expandBigqueryDataTransferConfigAuthorizationCode(d.Get("authorization_code"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("authorization_code"); !isEmptyValue(reflect.ValueOf(v)) && (ok || !reflect.DeepEqual(v, authorizationCodeProp)) {
+		obj["authorizationCode"] = authorizationCodeProp
+	}
 	disabledProp, err := expandBigqueryDataTransferConfigDisabled(d.Get("disabled"), d, config)
 	if err != nil {
 		return err
@@ -553,6 +591,14 @@ func resourceBigqueryDataTransferConfigUpdate(d *schema.ResourceData, meta inter
 
 	if d.HasChange("data_refresh_window_days") {
 		updateMask = append(updateMask, "dataRefreshWindowDays")
+	}
+
+	if d.HasChange("version_info") {
+		updateMask = append(updateMask, "versionInfo")
+	}
+
+	if d.HasChange("authorization_code") {
+		updateMask = append(updateMask, "authorizationCode")
 	}
 
 	if d.HasChange("disabled") {
@@ -828,6 +874,14 @@ func expandBigqueryDataTransferConfigNotificationPubsubTopic(v interface{}, d Te
 }
 
 func expandBigqueryDataTransferConfigDataRefreshWindowDays(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandBigqueryDataTransferConfigVersionInfo(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandBigqueryDataTransferConfigAuthorizationCode(v interface{}, d TerraformResourceData, config *Config) (interface{}, error) {
 	return v, nil
 }
 
